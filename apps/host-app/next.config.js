@@ -4,6 +4,7 @@
 const { withNx } = require('@nrwl/next/plugins/with-nx');
 const { NextFederationPlugin } = require('@module-federation/nextjs-mf');
 const { FederatedTypesPlugin } = require('@module-federation/typescript');
+const ExternalTemplateRemotesPlugin = require('external-remotes-plugin');
 
 const TEMPLATE_APP_URL =
   process.env.NEXT_PUBLIC_TEMPLATE_APP_URL ?? 'http://localhost:3000';
@@ -55,6 +56,7 @@ const nextConfig = {
           remotes: remotes(options.isServer),
         })
       );
+      config.plugins.push(new ExternalTemplateRemotesPlugin());
     }
 
     // config.plugins.push(
