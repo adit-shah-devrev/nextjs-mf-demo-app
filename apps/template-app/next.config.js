@@ -4,6 +4,8 @@
 const { withNx } = require('@nrwl/next/plugins/with-nx');
 const { NextFederationPlugin } = require('@module-federation/nextjs-mf');
 const { FederatedTypesPlugin } = require('@module-federation/typescript');
+const path = require('path');
+const fs = require('fs');
 
 const REMOTE_APP_URL =
   process.env.NEXT_PUBLIC_REMOTE_APP_URL ?? 'http://localhost:3001';
@@ -16,15 +18,30 @@ const remotes = (isServer) => {
   };
 };
 
-const federationConfig = (isServer) => ({
-  exposes: {
-    './page-url-to-component-map': './components/page-url-to-component-map.ts',
-  },
+const typeRemotes = {
+  'remote-app': `remote-app@${REMOTE_APP_URL}/_next/static/chunks//remoteEntry.js`,
+};
+
+const exposes = {
+  './index': './pages/index.tsx',
+};
+const exposePath = './pages';
+
+fs.readdirSync(path.resolve(__dirname, exposePath)).forEach((file) => {
+  if (path.extname(file) === '.tsx' && !file.startsWith('_')) {
+    const exposeName = path.basename(file, path.extname(file));
+    exposes[`./${exposeName}`] = `${exposePath}/${exposeName}.tsx`;
+  }
+});
+
+console.info('exposes', exposes);
+
+const federationConfig = {
+  exposes,
   extraOptions: {},
   filename: 'static/chunks/remoteEntry.js',
   name: 'template-app',
-  remotes: remotes(isServer),
-});
+};
 
 /**
  * @type {import('@nrwl/next/plugins/with-nx').WithNxOptions}
@@ -37,12 +54,18 @@ const nextConfig = {
   },
   webpack: (config, options) => {
     config.plugins.push(
-      new NextFederationPlugin(federationConfig(options.isServer))
+      new NextFederationPlugin({
+        ...federationConfig,
+        remotes: remotes(options.isServer),
+      })
     );
 
     config.plugins.push(
       new FederatedTypesPlugin({
-        federationConfig: federationConfig(false),
+        federationConfig: {
+          ...federationConfig,
+          remotes: typeRemotes,
+        },
       })
     );
 
