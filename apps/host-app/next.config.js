@@ -9,13 +9,13 @@ const ExternalTemplateRemotesPlugin = require('external-remotes-plugin');
 const TEMPLATE_APP_URL =
   process.env.NEXT_PUBLIC_TEMPLATE_APP_URL ?? 'http://localhost:3000';
 
-const remotes = (isServer) => {
-  const location = isServer ? 'ssr' : 'chunks';
+// const remotes = (isServer) => {
+//   const location = isServer ? 'ssr' : 'chunks';
 
-  return {
-    'template-app': `template-app@[window.templateAppUrl]/_next/static/${location}/remoteEntry.js`,
-  };
-};
+//   return {
+//     'template-app': `template-app@[window.templateAppUrl]/_next/static/${location}/remoteEntry.js`,
+//   };
+// };
 
 // const typeRemotes = {
 //   'template-app': `template-app@$[window.templateAppUrl]/_next/static/chunks//remoteEntry.js`,
@@ -29,9 +29,9 @@ const remotes = (isServer) => {
 //   };
 // };
 
-const typeRemotes = {
-  'template-app': `template-app@${TEMPLATE_APP_URL}/_next/static/chunks//remoteEntry.js`,
-};
+// const typeRemotes = {
+//   'template-app': `template-app@${TEMPLATE_APP_URL}/_next/static/chunks//remoteEntry.js`,
+// };
 
 const federationConfig = {
   extraOptions: {},
@@ -53,10 +53,13 @@ const nextConfig = {
       config.plugins.push(
         new NextFederationPlugin({
           ...federationConfig,
-          remotes: remotes(options.isServer),
+          remotes: [],
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          // runtimePlugins: [require.resolve('./runtimePlugin.js')],
         })
       );
-      config.plugins.push(new ExternalTemplateRemotesPlugin());
+      // config.plugins.push(new ExternalTemplateRemotesPlugin());
     }
 
     // config.plugins.push(

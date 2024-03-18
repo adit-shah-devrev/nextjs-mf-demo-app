@@ -1,18 +1,13 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import './styles.css';
+import { init, registerRemotes } from '@module-federation/runtime';
 
 interface CustomAppProps extends AppProps {
   templateAppUrl: string;
 }
 
 function CustomApp({ Component, pageProps, templateAppUrl }: CustomAppProps) {
-  if (typeof window !== 'undefined') {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    window.templateAppUrl = templateAppUrl;
-  }
-
   return (
     <>
       <Head>
@@ -24,11 +19,5 @@ function CustomApp({ Component, pageProps, templateAppUrl }: CustomAppProps) {
     </>
   );
 }
-
-CustomApp.getInitialProps = async () => {
-  return {
-    templateAppUrl: '//localhost:3002',
-  };
-};
 
 export default CustomApp;
